@@ -17,29 +17,47 @@ function App() {
   });
 
   const provider = new firebase.auth.GoogleAuthProvider();
-  const handelSignin = () =>{
+  const handelSignin = () => {
     // console.log("sign in");
     firebase.auth().signInWithPopup(provider)
-    .then(res =>{
-      const {displayName,photoURL, email} = res.user;
-      const signedInUser = {
-        isSignIn: true,
-        name: displayName,
-        email: email,
-        photo: photoURL
-      }
-      setUser(signedInUser);
-      console.log(displayName,photoURL, email);
-    })
-    .catch(err => {
-      console.log(err);
-      console.log(err.massage);
-    })
+      .then(res => {
+        const { displayName, photoURL, email } = res.user;
+        const signedInUser = {
+          isSignIn: true,
+          name: displayName,
+          email: email,
+          photo: photoURL
+        }
+        setUser(signedInUser);
+        console.log(displayName, photoURL, email);
+      })
+      .catch(err => {
+        console.log(err);
+        console.log(err.massage);
+      })
   }
-  
+  const handelSignOut = () => {
+    firebase.auth().signOut()
+      .then(() => {
+        const signedOutUser = {
+          isSignIn: false,
+          name: "",
+          email: '',
+          photo: ''
+        }
+        setUser(signedOutUser);
+      }).catch((err) => {
+
+      });
+    console.log('Sign out click');
+  }
+
   return (
     <div className="App">
-      <button onClick={handelSignin}>Sign In</button>
+      {
+        user.isSignIn ? <button onClick={handelSignOut}>Sign Out</button> :
+          <button onClick={handelSignin}>Sign In</button>
+      }
       {
         user.isSignIn && <div>
           <p>welcome, {user.name}</p>
