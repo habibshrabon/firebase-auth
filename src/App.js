@@ -48,6 +48,8 @@ function App() {
           name: "",
           email: "",
           photo: "",
+          error: "",
+          success: false
         };
         setUser(signedOutUser);
       })
@@ -73,8 +75,25 @@ function App() {
       // console.log(newUserInfo);
     }
   }
-  const handelSubmit = () =>{
-    
+  const handelSubmit = (event) =>{
+    // console.log(user.email, user.password);
+    if(user.email && user.password){
+      firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
+        .then(res => {
+          const newUserInfo = {...user};
+          newUserInfo.error = '';
+          newUserInfo.success = true;
+          // console.log(res);
+          setUser(newUserInfo);
+        })
+        .catch(error => {
+          const newUserInfo = {...user};
+          newUserInfo.error = error.message;
+          newUserInfo.success = false;
+          setUser(newUserInfo);
+        });
+    }
+    event.preventDefault();
   }
   return (
     <div className="App">
@@ -87,23 +106,23 @@ function App() {
         <div>
           <p>welcome, {user.name}</p>
           <p>Your Email: {user.email}</p>
-          <img src={user.photo}/>
+          <img src={user.photo} alt=""/>
         </div>
       )}
 
       <h1>Our own Authentication</h1>
-      <p>Email: {user.email}</p>
-      <p>Password: {user.password}</p>
 
-      <from onSubmit={handelSubmit}>
-        <input type="text" name="name" onBlur={handelBlur} placeholder="Your Name" required />
+      <form onSubmit={handelSubmit}>
+        <input type="text" name="name" onBlur={handelBlur} placeholder="Your Name" />
         <br/>
         <input type="text" name="email" onBlur={handelBlur} placeholder="Your Email Address" required />
         <br/>
         <input type="password" name="password" onBlur={handelBlur} placeholder="Your Password" required />
         <br/>
         <input type="submit" value="Submit"/>
-      </from>
+      </form>
+        <p style={{color:'red'}}>{user.error}</p>
+        {user.success && <p style={{color:'green'}}>User created successfully</p>}
     </div>
   );
 }
